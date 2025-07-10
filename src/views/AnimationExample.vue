@@ -1,115 +1,88 @@
 <template>
   <div class="animation-example">
-    <div class="eyes-container">
-      <div
-        v-for="i in 12"
-        :key="i"
-        :ref="el => { if (el && 'offsetHeight' in el) lottieContainers[i-1] = el as HTMLElement }"
+    <div 
+      v-for="(circle, circleIndex) in circles" 
+      :key="circleIndex"
+      class="circle-container"
+    >
+      <div 
+        v-for="(eye, eyeIndex) in eyes" 
+        :key="eyeIndex"
         class="eye-container"
-        :style="getEyePosition(i)"
+        :ref="el => setEyeRef(el, circleIndex, eyeIndex)"
+        :style="getEyeStyle(circleIndex, eyeIndex)"
       ></div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, type Ref } from "vue";
-import lottie from "lottie-web";
-import eyeAnimation from "@/assets/eye.json";
+import { ref, onMounted, type Ref } from 'vue'
+import lottie, { type AnimationItem } from 'lottie-web'
+import eyeAnimation from '@/assets/eye.json'
 
-const lottieContainers = ref<HTMLElement[]>([]);
-const anims = ref<any[]>([]);
+interface CircleConfig {
+  radius: number
+  eyeCount: number
+}
 
-const radius = 200; // 圆形半径
-const center = { x: 200, y: 200 };
-const eyesCount = 12;
-const getEyePosition = (index: number) => {
-  const angle = (index / eyesCount) * Math.PI * 2;
+const circles = ref<CircleConfig[]>([
+  { radius: 200, eyeCount: 12 },
+  { radius: 150, eyeCount: 8 }
+])
+
+const eyes = ref(Array(12).fill(0))
+const eyeRefs = ref<(HTMLElement | null)[][]>([])
+const anims = ref<AnimationItem[][]>([])
+
+const setEyeRef = (el: HTMLElement | null, circleIndex: number, eyeIndex: number) => {
+  if (!eyeRefs.value[circleIndex]) {
+    eyeRefs.value[circleIndex] = []
+  }
+  eyeRefs.value[circleIndex][eyeIndex] = el
+}
+
+const getEyeStyle = (circleIndex: number, eyeIndex: number) => {
+  const circle = circles.value[circleIndex]
+  const angle = (eyeIndex / circle.eyeCount) * Math.PI * 2
   return {
-    left: `${center.x + radius * Math.cos(angle)}px`,
-    top: `${center.y + radius * Math.sin(angle)}px`,
-    transform: `rotate(${(index / eyesCount) * 360 + 90}deg)`,
-  };
-};
-class Eye {
-  animation: any;
-  container: HTMLElement | null;
-  constructor(animation: any, container: HTMLElement) {
-    this.container = container;
-    this.animation = lottie.loadAnimation({
-      container,
-      renderer: "svg",
-      loop: true,
-      autoplay: true,
-      animationData: animation,
-    });
+    left: `${circle.radius * Math.cos(angle)}px`,
+    top: `${circle.radius * Math.sin(angle)}px`,
+    transform: `rotate(${(eyeIndex / circle.eyeCount) * 360 + 90}deg)`
   }
 }
-
-class CircleContainer {
-  lottieContainers: Ref<HTMLElement[]>;
-  radius: number;
-  center: { x: number; y: number };
-  count: number;
-  eyes: Eye[] = [];
-
-  constructor(
-    lottieContainers: Ref<HTMLElement[]>,
-    radius: number,
-    center: { x: number; y: number },
-    count: number
-  ) {
-    this.lottieContainers = lottieContainers;
-    this.radius = radius;
-    this.center = center;
-    this.count = count;
-    this.initEyes();
-  }
-
-  initEyes() {
-    this.eyes = this.lottieContainers.value.map((container) => {
-      return new Eye(eyeAnimation, container);
-    });
-  }
-}
-
-const circlesConfig = [
-  {
-    lottieContainers,
-    radius: 200,
-    center: { x: 200, y: 200 },
-    count: 12,
-  },
-  {
-    lottieContainers,
-    radius: 300,
-    center: { x: 300, y: 250 },
-    count: 18,
-  },
-  {
-    lottieContainers,
-    radius: 400,
-    center: { x: 350, y: 300 },
-    count: 24,
-  },
-];
-const circles = circlesConfig.map(config => new CircleContainer(config.lottieContainers, config.radius, config.center, config.count))
 
 onMounted(() => {
-  lottieContainers.value.forEach((container, index) => {
-    if (container) {
-      const anim = lottie.loadAnimation({
-        container,
-        renderer: "svg",
-        loop: true,
-        autoplay: true,
-        animationData: eyeAnimation,
-      });
-
-      anims.value.push(anim);
+  eyeRefs.value.forEach((circleEyes, circleIndex) => {
+    if (!anims.value[circleIndex]) {
+      anims.value[circleIndex] = []
     }
-  });
-});
+    
+    circleEyes.forEach((eyeContainer, eyeIndex) => {
+      if (eyeContainer) {
+        const anim = lottie.loadAnimation({
+          container: eyeContainer,
+          renderer: 'svg',
+          loop: true,
+          autoplay: true,
+          animationData: eyeAnimation
+        })
+        anims.value[circleIndex][eyeIndex] = anim
+      }
+    })
+  })
+})
+
+// 提供外部访问方法
+const setEyeSpeed = (circleIndex: number, eyeIndex: number, speed: number) => {
+  if (anims.value[circleIndex]?.[eyeIndex]) {
+    anims.value[circleIndex][eyeIndex].setSpeed(speed)
+  }
+}
+
+defineExpose({
+  setEyeSpeed
+})
 </script>
 
 <style scoped>
@@ -122,19 +95,18 @@ onMounted(() => {
   height: 100%;
 }
 
-.eyes-container {
+.circle-container {
   position: relative;
-  width: 100%;
-  height: 100%;
-  transform-origin: 230px 230px /*center center*/;
-  animation: rotate 10s linear infinite;
-  will-change: transform;
+  width: 400px;
+  height: 400px;
+  margin: 20px auto;
 }
 
 .eye-container {
   position: absolute;
   width: 60px;
   height: 60px;
+  transform-origin: center;
 }
 
 @keyframes rotate {
