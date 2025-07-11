@@ -21,14 +21,19 @@ import { ref, onMounted, type Ref } from 'vue'
 import lottie, { type AnimationItem } from 'lottie-web'
 import eyeAnimation from '@/assets/eye.json'
 
+// @ts-ignore
+import LottieApi from 'lottie-api';
+
 interface CircleConfig {
   radius: number
   eyeCount: number
+  centerX?: number
+  centerY?: number
 }
 
 const circles = ref<CircleConfig[]>([
-  { radius: 200, eyeCount: 12 },
-  { radius: 150, eyeCount: 8 }
+  { radius: 200, eyeCount: 12, centerX: 200, centerY: 200 },
+  { radius: 150, eyeCount: 8, centerX: 400, centerY: 200 }
 ])
 
 const eyes = ref(Array(12).fill(0))
@@ -46,8 +51,8 @@ const getEyeStyle = (circleIndex: number, eyeIndex: number) => {
   const circle = circles.value[circleIndex]
   const angle = (eyeIndex / circle.eyeCount) * Math.PI * 2
   return {
-    left: `${circle.radius * Math.cos(angle)}px`,
-    top: `${circle.radius * Math.sin(angle)}px`,
+    left: `${(circle.centerX || 0) + circle.radius * Math.cos(angle)}px`,
+    top: `${(circle.centerY || 0) + circle.radius * Math.sin(angle)}px`,
     transform: `rotate(${(eyeIndex / circle.eyeCount) * 360 + 90}deg)`
   }
 }
@@ -67,6 +72,8 @@ onMounted(() => {
           autoplay: true,
           animationData: eyeAnimation
         })
+        const api = LottieApi.createAnimationApi(anim)
+
         anims.value[circleIndex][eyeIndex] = anim
       }
     })
@@ -80,14 +87,23 @@ const setEyeSpeed = (circleIndex: number, eyeIndex: number, speed: number) => {
   }
 }
 
+const setCircleCenter = (circleIndex: number, x: number, y: number) => {
+  if (circles.value[circleIndex]) {
+    circles.value[circleIndex].centerX = x
+    circles.value[circleIndex].centerY = y
+  }
+}
+
 defineExpose({
-  setEyeSpeed
+  setEyeSpeed,
+  setCircleCenter
 })
 </script>
 
 <style scoped>
 .animation-example {
   display: flex;
+  position: relative;
   flex-direction: column;
   align-items: center;
   overflow: hidden;
@@ -96,10 +112,11 @@ defineExpose({
 }
 
 .circle-container {
-  position: relative;
+  position: absolute;
   width: 400px;
   height: 400px;
-  margin: 20px auto;
+  top: 0;
+  left: 0;
 }
 
 .eye-container {
