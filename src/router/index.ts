@@ -30,7 +30,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/animation',
     name: 'Animation',
-    component: () => import('@/views/AnimationExample.vue')
+    component: () => import('@/views/AnimationExample/AnimationExample.vue')
   }
 ];
 
