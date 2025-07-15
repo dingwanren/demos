@@ -1,6 +1,6 @@
 <template>
   <div class="animation-example">
-    <circle-panel :circles="circles"></circle-panel>
+    <circle-panel v-model:circles="circles"></circle-panel>
     <div
       v-for="(circle, circleIndex) in circles"
       :key="circleIndex"
@@ -13,7 +13,7 @@
       }"
     >
       <div
-        v-for="(eye, eyeIndex) in eyes"
+        v-for="(eye, eyeIndex) in circle.eyeCount"
         :key="eyeIndex"
         class="eye-container"
         :ref="(el) => setEyeRef(el, circleIndex, eyeIndex)"
@@ -24,10 +24,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, type Ref } from "vue";
+import { ref, onMounted, watch, type Ref } from "vue";
 import lottie, { type AnimationItem } from "lottie-web";
 import eyeAnimation from "@/assets/eye.json";
-import circlePanel from './components/circlePanel.vue'
+import circlePanel from "./components/circlePanel.vue";
 
 // @ts-ignore
 import LottieApi from "lottie-api";
@@ -44,10 +44,35 @@ const circles = ref<CircleConfig[]>([
   { radius: 150, eyeCount: 8, centerX: 400, centerY: 200 },
 ]);
 
-const eyes = ref(Array(12).fill(0));
 const eyeRefs = ref<(HTMLElement | null)[][]>([]);
 const anims = ref<AnimationItem[][]>([]);
 
+watch(
+  eyeRefs,
+  (newEyeRefs) => {
+  newEyeRefs.forEach((circleEyes, circleIndex) => {
+    if (!anims.value[circleIndex]) {
+      anims.value[circleIndex] = [];
+    }
+
+    circleEyes.forEach((eyeContainer, eyeIndex) => {
+      if (eyeContainer) {
+      // watch去 loadanime 会让已有的重复load
+        const anim = lottie.loadAnimation({
+          container: eyeContainer,
+          renderer: "svg",
+          loop: true,
+          autoplay: false,
+          animationData: eyeAnimation,
+        });
+
+        anims.value[circleIndex][eyeIndex] = anim;
+      }
+    });
+  });
+  },
+  { deep: true }
+);
 const setEyeRef = (
   el: HTMLElement | null,
   circleIndex: number,
@@ -69,54 +94,27 @@ const getEyeStyle = (circleIndex: number, eyeIndex: number) => {
   };
 };
 
-onMounted(() => {
-  eyeRefs.value.forEach((circleEyes, circleIndex) => {
-    if (!anims.value[circleIndex]) {
-      anims.value[circleIndex] = [];
-    }
+// onMounted(() => {
+//   eyeRefs.value.forEach((circleEyes, circleIndex) => {
+//     if (!anims.value[circleIndex]) {
+//       anims.value[circleIndex] = [];
+//     }
 
-    circleEyes.forEach((eyeContainer, eyeIndex) => {
-      if (eyeContainer) {
-        const anim = lottie.loadAnimation({
-          container: eyeContainer,
-          renderer: "svg",
-          loop: true,
-          autoplay: false,
-          animationData: eyeAnimation,
-        });
+//     circleEyes.forEach((eyeContainer, eyeIndex) => {
+//       if (eyeContainer) {
+//         const anim = lottie.loadAnimation({
+//           container: eyeContainer,
+//           renderer: "svg",
+//           loop: true,
+//           autoplay: false,
+//           animationData: eyeAnimation,
+//         });
 
-        anims.value[circleIndex][eyeIndex] = anim;
-      }
-    });
-  });
-});
-
-// 提供外部访问方法
-const setEyeSpeed = (circleIndex: number, eyeIndex: number, speed: number) => {
-  if (anims.value[circleIndex]?.[eyeIndex]) {
-    anims.value[circleIndex][eyeIndex].setSpeed(speed);
-  }
-};
-
-const setCircleCenter = (circleIndex: number, x: number, y: number) => {
-  if (circles.value[circleIndex]) {
-    circles.value[circleIndex].centerX = x;
-    circles.value[circleIndex].centerY = y;
-  }
-};
-
-const setRotationSpeed = (circleIndex: number, speed: number) => {
-  const container = eyeRefs.value[circleIndex]?.[0]?.parentElement;
-  if (container) {
-    container.style.setProperty("--rotation-speed", `${10 / speed}s`);
-  }
-};
-
-defineExpose({
-  setEyeSpeed,
-  setCircleCenter,
-  setRotationSpeed,
-});
+//         anims.value[circleIndex][eyeIndex] = anim;
+//       }
+//     });
+//   });
+// });
 </script>
 
 <style scoped>

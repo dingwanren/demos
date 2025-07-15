@@ -44,6 +44,7 @@ watch(
 
 // 当输入值变化时触发更新
 function onChange() {
+  console.log('onchange')
   emit('update:circles', [...localCircles.value]);
 }
 
