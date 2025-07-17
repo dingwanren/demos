@@ -45,31 +45,26 @@ const circles = ref<CircleConfig[]>([
 ]);
 
 const eyeRefs = ref<(HTMLElement | null)[][]>([]);
-const anims = ref<AnimationItem[][]>([]);
+const animMap = new WeakMap();
 
 watch(
   eyeRefs,
   (newEyeRefs) => {
-  newEyeRefs.forEach((circleEyes, circleIndex) => {
-    if (!anims.value[circleIndex]) {
-      anims.value[circleIndex] = [];
-    }
+    newEyeRefs.forEach((circleEyes) => {
+      circleEyes.forEach((eyeContainer) => {
+        if (eyeContainer && !animMap.has(eyeContainer)) {
+          const anim = lottie.loadAnimation({
+            container: eyeContainer,
+            renderer: 'svg',
+            loop: true,
+            autoplay: false,
+            animationData: eyeAnimation,
+          });
 
-    circleEyes.forEach((eyeContainer, eyeIndex) => {
-      if (eyeContainer) {
-      // watch去 loadanime 会让已有的重复load
-        const anim = lottie.loadAnimation({
-          container: eyeContainer,
-          renderer: "svg",
-          loop: true,
-          autoplay: false,
-          animationData: eyeAnimation,
-        });
-
-        anims.value[circleIndex][eyeIndex] = anim;
-      }
+          animMap.set(eyeContainer, anim);
+        }
+      });
     });
-  });
   },
   { deep: true }
 );
@@ -94,27 +89,6 @@ const getEyeStyle = (circleIndex: number, eyeIndex: number) => {
   };
 };
 
-// onMounted(() => {
-//   eyeRefs.value.forEach((circleEyes, circleIndex) => {
-//     if (!anims.value[circleIndex]) {
-//       anims.value[circleIndex] = [];
-//     }
-
-//     circleEyes.forEach((eyeContainer, eyeIndex) => {
-//       if (eyeContainer) {
-//         const anim = lottie.loadAnimation({
-//           container: eyeContainer,
-//           renderer: "svg",
-//           loop: true,
-//           autoplay: false,
-//           animationData: eyeAnimation,
-//         });
-
-//         anims.value[circleIndex][eyeIndex] = anim;
-//       }
-//     });
-//   });
-// });
 </script>
 
 <style scoped>
