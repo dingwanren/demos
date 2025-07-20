@@ -10,8 +10,13 @@
         height: circle.radius * 2 + 60 + 'px',
         top: circle.centerY + 'px',
         left: circle.centerX + 'px',
+        '--rotation-speed': circle.rotationSpeed + 's',
+        'animation-direction': circle.rotationDirection === 'clockwise' ? 'normal' : 'reverse'
       }"
     >
+      <!-- 半径会影响盒子大小,从而影响left,top偏移,从而影响圆心位置,所以半径不同,虽圆心xy位置一样,页面显示出来也是不同位置的 -->
+      <!-- 圆心调试点 -->
+      <div class="center-point"></div>
       <div
         v-for="(eye, eyeIndex) in circle.eyeCount"
         :key="eyeIndex"
@@ -24,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, type Ref } from "vue";
+import { ref, onBeforeUnmount, watch, type Ref } from "vue";
 import lottie, { type AnimationItem } from "lottie-web";
 import eyeAnimation from "@/assets/eye.json";
 import circlePanel from "./components/circlePanel.vue";
@@ -37,15 +42,20 @@ interface CircleConfig {
   eyeCount: number;
   centerX: number;
   centerY: number;
+  rotationSpeed: number;      // 新增：旋转时长（秒）
+  rotationDirection: 'clockwise' | 'counter-clockwise';  // 新增：方向
 }
 
 const circles = ref<CircleConfig[]>([
-  { radius: 200, eyeCount: 12, centerX: 200, centerY: 200 },
-  { radius: 150, eyeCount: 8, centerX: 400, centerY: 200 },
+  { radius: 200, eyeCount: 12, centerX: 200, centerY: 200, rotationSpeed: 20, rotationDirection: 'clockwise' },
+  { radius: 150, eyeCount: 8, centerX: 400, centerY: 200, rotationSpeed: 20, rotationDirection: 'clockwise' },
 ]);
 
 const eyeRefs = ref<(HTMLElement | null)[][]>([]);
-const animMap = new WeakMap();
+
+// 因为 Map 对键是强引用，如果你保存了 DOM 元素，而这些 DOM 元素又被移除出页面，但你没有手动从 Map 中删除它们，就可能导致内存泄漏
+// const animMap = new WeakMap();
+const animMap = new Map();
 
 watch(
   eyeRefs,
@@ -89,6 +99,11 @@ const getEyeStyle = (circleIndex: number, eyeIndex: number) => {
   };
 };
 
+onBeforeUnmount(() => {
+  animMap.forEach((anim, container) => {
+    anim.destroy();  // 销毁 Lottie 动画
+  });
+});
 </script>
 
 <style scoped>
@@ -105,7 +120,21 @@ const getEyeStyle = (circleIndex: number, eyeIndex: number) => {
   position: absolute;
   transform-origin: center;
   animation: rotate linear infinite;
-  animation-duration: var(--rotation-speed, 10s);
+  animation-duration: var(--rotation-speed, 20s);
+  animation-direction: var(--rotation-direction, normal); /* 可以是 normal / reverse */
+}
+
+.center-point {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background-color: red;
+  border-radius: 50%;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  pointer-events: none; /* 避免干扰点击事件 */
 }
 
 .eye-container {

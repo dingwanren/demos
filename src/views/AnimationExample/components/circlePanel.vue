@@ -5,7 +5,13 @@
       <input type="number" v-model.number="circle.centerY" @change="onChange" placeholder="Y" class="short-input" />
       <input type="number" v-model.number="circle.radius" @change="onChange" placeholder="半径" class="short-input" />
       <input type="number" v-model.number="circle.eyeCount" @change="onChange" placeholder="数量" class="short-input" />
-      <button @click="removeCircle(index)">删除</button>
+      <!-- 新增字段 -->
+      <input type="number" v-model.number="circle.rotationSpeed" @change="onChange" placeholder="时长(s)" class="short-input" />
+      <select v-model="circle.rotationDirection" @change="onChange" class="short-input">
+        <option value="clockwise">顺时针</option>
+        <option value="counter-clockwise">逆时针</option>
+      </select>
+      <button @click="removeCircle(index)">x</button>
     </div>
     <button @click="addCircle">+ 新增圆</button>
   </div>
@@ -20,6 +26,8 @@ interface CircleConfig {
   centerY: number;
   radius: number;
   eyeCount: number;
+  rotationSpeed: number;      // 新增：旋转时长（秒）
+  rotationDirection: 'clockwise' | 'counter-clockwise';  // 新增：方向
 }
 
 // 接收 props
@@ -51,15 +59,18 @@ function onChange() {
 // 新增圆配置
 function addCircle() {
   localCircles.value.push({
-    centerX: 0,
-    centerY: 0,
-    radius: 10,
-    eyeCount: 1
+    centerX: 200,
+    centerY: 200,
+    radius: 200,
+    eyeCount: 12,
+    rotationSpeed: 30,
+    rotationDirection: 'clockwise'
   });
   onChange();
 }
 
 // 删除指定索引的圆
+// 目前删除的时候, lottie动画还是会存在,没被销毁
 function removeCircle(index: number) {
   localCircles.value.splice(index, 1);
   onChange();
@@ -71,11 +82,13 @@ function removeCircle(index: number) {
 <style scoped>
 .config-panel {
   position: absolute;
+  z-index: 2;
   right: 0;
   top: 0;
   border: 1px solid #ccc;
   padding: 10px;
   max-width: 600px;
+  overflow: auto;
 }
 
 .circle-row {
