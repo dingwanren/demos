@@ -1,14 +1,18 @@
 {
-  "name": "example-cli",
+  "name": "mk-cli",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/bin/cli.js",
   "type": "module",
   "bin": {
-    "example-cli": "src/bin/cli.ts"
+    "mk-cli": "dist/bin/cli.js"
   },
   "scripts": {
     "build": "tsc"
   },
+  "files": [
+    "dist",
+    "template"
+  ],
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -21,6 +25,12 @@
     "inquirer": "^12.8.2"
   },
   "devDependencies": {
+    "@babel/generator": "^7.28.0",
+    "@babel/parser": "^7.28.0",
+    "@babel/traverse": "^7.28.0",
+    "@babel/types": "^7.28.2",
+    "@types/babel__generator": "^7.27.0",
+    "@types/babel__traverse": "^7.20.7",
     "@types/ejs": "^3.1.5",
     "@types/fs-extra": "^11.0.4",
     "typescript": "^5.8.3"
