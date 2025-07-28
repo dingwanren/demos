@@ -18,9 +18,9 @@ const routes: Array<RouteRecordRaw> = [
   { 
     path: '/virtual-column-example',
     name: 'VirtualColumnExample',
-    component: () => import('@/views/VirtualColumnExample.vue')
+    component: () => import('@/views/VirtualList/VirtualColumnExample.vue')
   },
-  { path: '/new-example', name: 'NewExample', component: () => import('@/views/NewExamplePage.vue') },
+  { path: '/new-example', name: 'NewExample', component: () => import('@/views/PhotoHalo.vue') },
   { path: '/poker-carousel', name: 'PokerCarousel', component: () => import('@/views/PokerCarousel.vue') },
   {
     path: '/bar-chart-example',
