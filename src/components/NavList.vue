@@ -23,7 +23,7 @@
           >
             <span class="nav-item-content">
               <!-- 为每个导航项添加图标 -->
-              <Icon :icon="getIconForRoute(item.path)" class="nav-icon" />
+              <Icon :icon="item.icon" class="nav-icon" />
               <span class="nav-text">{{ item.name }}</span>
             </span>
           </RouterLink>
@@ -38,31 +38,16 @@ import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { Icon } from '@iconify/vue'
 
 const navList = ref([
-  { name: '饼图示例', path: '/chart-example' },
-  { name: '柱状图示例', path: '/bar-chart-example' },
-  { name: '高级搜索组件示例', path: '/advanced-search-example' },
-  { name: '虚拟列表示例', path: '/virtual-column-example' },
-  { name: '图片光圈(伪类实现)', path: '/new-example' },
-  { name: '扑克轮播', path: '/poker-carousel' },
-  { name: '动画示例', path: '/animation' },
+  { name: '饼图示例', path: '/chart-example', icon: 'mdi:chart-pie' },
+  { name: '柱状图示例', path: '/bar-chart-example', icon: 'mdi:chart-bar' },
+  { name: '高级搜索组件示例', path: '/advanced-search-example', icon: 'mdi:card-search' },
+  { name: '虚拟列表示例', path: '/virtual-column-example', icon: 'mdi:table-column' },
+  { name: '图片光圈(伪类实现)', path: '/new-example', icon: 'mdi:image-filter-center-focus' },
+  { name: '扑克轮播', path: '/poker-carousel', icon: 'mdi:cards-playing-outline' },
+  { name: '动画示例', path: '/animation', icon: 'mdi:animation-play' },
 ])
 
 const isMenuOpen = ref(false)
-
-// 根据路由路径获取对应的图标
-const getIconForRoute = (path: string) => {
-  const icons: Record<string, string> = {
-    '/chart-example': 'mdi:chart-pie',
-    '/bar-chart-example': 'mdi:chart-bar',
-    '/advanced-search-example': 'mdi:card-search',
-    '/virtual-column-example': 'mdi:table-column',
-    '/new-example': 'mdi:image-filter-center-focus',
-    '/poker-carousel': 'mdi:cards-playing-outline',
-    '/animation': 'mdi:animation-play'
-  }
-  return icons[path] || 'mdi:link'
-}
-
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value
   if (isMenuOpen.value) {

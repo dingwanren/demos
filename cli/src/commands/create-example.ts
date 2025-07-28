@@ -5,6 +5,7 @@ import fs from 'fs-extra';
 
 import { renderTemplate } from '../utils/template.js';
 import { addRouteToRouterFile } from '../utils/route.js';
+import { addMenuItemToMenuComponent } from '../utils/menus.js';
 
 // 主项目 views 目录
 const VIEWS_DIR = path.resolve(process.cwd(), 'src', 'views');
@@ -26,7 +27,7 @@ export default async function createExample() {
     },
     {
       type: 'input',
-      name: 'path',
+      name: 'routePath',
       message: '请输入页面路径（如 /image-ripple）:',
       default: (answers) => `/${answers.name.toLowerCase().replace(/\s+/g, '-')}`,
     },
@@ -40,7 +41,7 @@ export default async function createExample() {
     },
   ]);
 
-  const { name, path: routePath, title } = answers;
+  const { name, routePath, title } : {name: string, routePath: string, title: string} = answers;
 
   console.log(chalk.green('\n✅ 用户输入：'));
   console.log(`  页面英文名: ${name}`);
@@ -65,4 +66,7 @@ export default async function createExample() {
 
   // ✅ 添加路由
   await addRouteToRouterFile(name, routePath, title);
+
+  // ✅ 添加菜单项
+  await addMenuItemToMenuComponent(name, routePath);
 }
