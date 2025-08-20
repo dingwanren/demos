@@ -1,42 +1,52 @@
-import { createRouter, createWebHistory } from "vue-router";
-import type { RouteRecordRaw } from "vue-router";
+import { createRouter, createWebHistory } from 'vue-router';
+import type { RouteRecordRaw } from 'vue-router';
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'home',
-    component: () => import('@/views/Home.vue')
+    component: () => import('@/views/Home.vue'),
   },
-  { path: '/chart-example',
+  {
+    path: '/chart-example',
     name: 'ChartExample',
-    component: () => import('@/views/ChartExample.vue') 
+    component: () => import('@/views/ChartExample.vue'),
   },
-  { path: '/advanced-search-example',
+  {
+    path: '/advanced-search-example',
     name: 'AdvancedSearchExample',
-    component: () => import('@/views/AdvancedSearchExample.vue')
+    component: () => import('@/views/AdvancedSearchExample.vue'),
   },
-  { 
+  {
     path: '/virtual-column-example',
     name: 'VirtualColumnExample',
-    component: () => import('@/views/VirtualList/VirtualColumnExample.vue')
+    component: () => import('@/views/VirtualList/VirtualColumnExample.vue'),
   },
-  { path: '/new-example', name: 'NewExample', component: () => import('@/views/PhotoHalo.vue') },
-  { path: '/poker-carousel', name: 'PokerCarousel', component: () => import('@/views/PokerCarousel.vue') },
+  {
+    path: '/new-example',
+    name: 'NewExample',
+    component: () => import('@/views/PhotoHalo.vue'),
+  },
+  {
+    path: '/poker-carousel',
+    name: 'PokerCarousel',
+    component: () => import('@/views/PokerCarousel.vue'),
+  },
   {
     path: '/bar-chart-example',
     name: 'BarChartExample',
-    component: () => import('@/views/BarChartExample.vue')
+    component: () => import('@/views/BarChartExample.vue'),
   },
   {
     path: '/animation',
     name: 'Animation',
-    component: () => import('@/views/AnimationExample/AnimationExample.vue')
-  }
+    component: () => import('@/views/AnimationExample/AnimationExample.vue'),
+  },
 ];
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes
+  routes,
 });
 
- export default router;
+export default router;
