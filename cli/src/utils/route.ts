@@ -6,16 +6,25 @@ import * as parser from '@babel/parser';
 import traverse from '@babel/traverse';
 import generate from '@babel/generator';
 import * as t from '@babel/types';
-
+import { formatCodeWithPrettier } from './format.js';
 import chalk from 'chalk';
 
 // 路由文件路径（根据你的项目结构修改）
-const ROUTE_FILE_PATH = path.resolve(process.cwd(), 'src', 'router', 'index.ts');
+const ROUTE_FILE_PATH = path.resolve(
+  process.cwd(),
+  'src',
+  'router',
+  'index.ts'
+);
 
 /**
  * 添加新路由到路由文件中
  */
-export async function addRouteToRouterFile(name: string, routePath: string, title: string) {
+export async function addRouteToRouterFile(
+  name: string,
+  routePath: string,
+  title: string
+) {
   // 构建新的路由对象 AST 节点
   const newRouteNode = t.objectExpression([
     t.objectProperty(t.identifier('path'), t.stringLiteral(routePath)),
@@ -42,24 +51,32 @@ export async function addRouteToRouterFile(name: string, routePath: string, titl
     });
 
     // 遍历 AST，找到 routes 数组并插入新路由
-    traverse.default(ast, {   // defaule 在 trae 里会显示 类型xxx上不存在属性“default” 的报错,但不影响编译
+    traverse.default(ast, {
+      // defaule 在 trae 里会显示 类型xxx上不存在属性“default” 的报错,但不影响编译
       VariableDeclarator(path) {
         const { id, init } = path.node;
 
-        if (t.isIdentifier(id, { name: 'routes' }) && t.isArrayExpression(init)) {
+        if (
+          t.isIdentifier(id, { name: 'routes' }) &&
+          t.isArrayExpression(init)
+        ) {
           init.elements.push(newRouteNode);
         }
       },
     });
 
     // 将 AST 转回代码
-    const output = generate.default(ast, {}, source);
-
+    const output = generate.default(ast, { retainLines: true });
+    console.log(output.code);
+    const formattedCode = (await formatCodeWithPrettier(
+      output.code,
+      ROUTE_FILE_PATH
+    )) as string;
     // 写入文件
-    await fs.writeFile(ROUTE_FILE_PATH, output.code, 'utf-8');
+    await fs.writeFile(ROUTE_FILE_PATH, formattedCode, 'utf-8');
 
     console.log(chalk.green(`✅ 路由已添加到 ${ROUTE_FILE_PATH}`));
-  } catch (error:any) {
+  } catch (error: any) {
     console.error(chalk.red(`❌ 添加路由失败：${error.message}`));
   }
 }

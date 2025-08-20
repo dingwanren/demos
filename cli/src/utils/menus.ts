@@ -5,9 +5,15 @@ import traverse from '@babel/traverse';
 import * as t from '@babel/types';
 import generate from '@babel/generator';
 import chalk from 'chalk';
+import { formatCodeWithPrettier } from './format.js';
 
 // 菜单组件路径
-const MENU_COMPONENT_PATH = path.resolve(process.cwd(), 'src', 'components', 'NavList.vue');
+const MENU_COMPONENT_PATH = path.resolve(
+  process.cwd(),
+  'src',
+  'components',
+  'NavList.vue'
+);
 
 interface MenuItem {
   name: string;
@@ -21,11 +27,14 @@ interface MenuItem {
  * @param routePath 路由路径
  * @returns Promise<void>
  */
-export async function addMenuItemToMenuComponent(name: string, routePath: string): Promise<void> {
+export async function addMenuItemToMenuComponent(
+  name: string,
+  routePath: string
+): Promise<void> {
   const menuItem: MenuItem = {
     name,
     path: routePath,
-    icon: 'mdi:link'
+    icon: 'mdi:link',
   };
 
   try {
@@ -38,8 +47,15 @@ export async function addMenuItemToMenuComponent(name: string, routePath: string
     const source = await fs.readFile(MENU_COMPONENT_PATH, 'utf-8');
 
     // 3. 提取 script setup 部分（改进正则以捕获完整标签）
-    const scriptSetupMatch = source.match(/(<script\s+setup[^>]*>)([\s\S]*?)(<\/script>)/i);
-    if (!scriptSetupMatch || !scriptSetupMatch[1] || !scriptSetupMatch[2] || !scriptSetupMatch[3]) {
+    const scriptSetupMatch = source.match(
+      /(<script\s+setup[^>]*>)([\s\S]*?)(<\/script>)/i
+    );
+    if (
+      !scriptSetupMatch ||
+      !scriptSetupMatch[1] ||
+      !scriptSetupMatch[2] ||
+      !scriptSetupMatch[3]
+    ) {
       throw new Error('未找到 <script setup> 部分');
     }
 
@@ -49,7 +65,7 @@ export async function addMenuItemToMenuComponent(name: string, routePath: string
     const ast = parser.parse(scriptContent, {
       sourceType: 'module',
       plugins: ['typescript'],
-      ranges: true
+      ranges: true,
     });
 
     let navListFound = false;
@@ -71,12 +87,16 @@ export async function addMenuItemToMenuComponent(name: string, routePath: string
           for (const element of arrayExpression.elements) {
             if (t.isObjectExpression(element)) {
               const pathProperty = element.properties.find(
-                prop => t.isObjectProperty(prop) &&
-                t.isIdentifier(prop.key, { name: 'path' })
+                (prop) =>
+                  t.isObjectProperty(prop) &&
+                  t.isIdentifier(prop.key, { name: 'path' })
               ) as t.ObjectProperty | undefined;
 
-              if (pathProperty && t.isStringLiteral(pathProperty.value) && 
-                  pathProperty.value.value === routePath) {
+              if (
+                pathProperty &&
+                t.isStringLiteral(pathProperty.value) &&
+                pathProperty.value.value === routePath
+              ) {
                 hasDuplicate = true;
                 break;
               }
@@ -89,35 +109,24 @@ export async function addMenuItemToMenuComponent(name: string, routePath: string
 
           // 创建新菜单项
           const newMenuItem = t.objectExpression([
-            t.objectProperty(t.identifier('name'), t.stringLiteral(menuItem.name)),
-            t.objectProperty(t.identifier('path'), t.stringLiteral(menuItem.path)),
-            t.objectProperty(t.identifier('icon'), t.stringLiteral(menuItem.icon!))
+            t.objectProperty(
+              t.identifier('name'),
+              t.stringLiteral(menuItem.name)
+            ),
+            t.objectProperty(
+              t.identifier('path'),
+              t.stringLiteral(menuItem.path)
+            ),
+            t.objectProperty(
+              t.identifier('icon'),
+              t.stringLiteral(menuItem.icon!)
+            ),
           ]);
 
           // 添加到数组末尾
           arrayExpression.elements.push(newMenuItem);
-
-          // 确保逗号格式正确
-          if (arrayExpression.elements.length > 1) {
-            const lastElement = arrayExpression.elements[arrayExpression.elements.length - 2];
-            if (lastElement && !t.isSpreadElement(lastElement)) {
-              const hasComma = lastElement.trailingComments?.some(
-                comment => comment.type === 'CommentLine' && comment.value.trim() === ','
-              );
-
-              if (!hasComma) {
-                const commaComment: t.CommentLine = {
-                  type: 'CommentLine',
-                  value: ',',
-                  loc: undefined
-                };
-                lastElement.trailingComments = lastElement.trailingComments || [];
-                lastElement.trailingComments.push(commaComment);
-              }
-            }
-          }
         }
-      }
+      },
     });
 
     if (!navListFound) {
@@ -127,15 +136,18 @@ export async function addMenuItemToMenuComponent(name: string, routePath: string
     // 6. 生成新代码
     const { code: newScriptContent } = generate.default(ast, {
       retainLines: true,
-      comments: true,
-      compact: false,
-      jsescOption: { minimal: true }
     });
+
+    // 使用 Prettier 格式化
+    const formattedCode = await formatCodeWithPrettier(
+      newScriptContent,
+      MENU_COMPONENT_PATH
+    );
 
     // 7. 替换原文件内容（关键修改：保留原 openingTag）
     const newSource = source.replace(
       fullMatch,
-      `${openingTag}\n${newScriptContent}\n${closingTag}`
+      `${openingTag}\n${formattedCode}\n${closingTag}`
     );
 
     // 8. 写入文件
