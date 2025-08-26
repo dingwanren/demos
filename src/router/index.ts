@@ -42,6 +42,11 @@ const routes: Array<RouteRecordRaw> = [
     name: 'Animation',
     component: () => import('@/views/AnimationExample/AnimationExample.vue'),
   },
+  {
+    path: '/x-ray',
+    name: 'Xray',
+    component: () => import('../views/Xray/index.vue'),
+  },
 ];
 
 const router = createRouter({

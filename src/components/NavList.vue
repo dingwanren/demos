@@ -39,142 +39,154 @@
 </template>
 
 <script setup lang="ts">
-  import { ref, onMounted, onBeforeUnmount, useTemplateRef } from 'vue';
-  import { Icon } from '@iconify/vue';
-
-  const navList = ref([
-    { name: '饼图示例', path: '/chart-example', icon: 'mdi:chart-pie' },
-    { name: '柱状图示例', path: '/bar-chart-example', icon: 'mdi:chart-bar' },
-    {
-      name: '高级搜索组件示例',
-      path: '/advanced-search-example',
-      icon: 'mdi:card-search',
-    },
-    {
-      name: '虚拟列表示例',
-      path: '/virtual-column-example',
-      icon: 'mdi:table-column',
-    },
-    {
-      name: '图片光圈(伪类实现)',
-      path: '/new-example',
-      icon: 'mdi:image-filter-center-focus',
-    },
-    {
-      name: '扑克轮播',
-      path: '/poker-carousel',
-      icon: 'mdi:cards-playing-outline',
-    },
-    { name: '动画示例', path: '/animation', icon: 'mdi:animation-play' },
-  ]);
-
-  const isMenuOpen = ref(false);
-  const toggleMenu = () => {
-    isMenuOpen.value = !isMenuOpen.value;
-    if (isMenuOpen.value) {
-      document.body.classList.add('no-scroll');
-    } else {
-      document.body.classList.remove('no-scroll');
-    }
-  };
-
-  const closeMenu = () => {
-    isMenuOpen.value = false;
+import { ref, onMounted, onBeforeUnmount, useTemplateRef } from 'vue';
+import { Icon } from '@iconify/vue';
+const navList = ref([
+  {
+    name: '饼图示例',
+    path: '/chart-example',
+    icon: 'mdi:chart-pie',
+  },
+  {
+    name: '柱状图示例',
+    path: '/bar-chart-example',
+    icon: 'mdi:chart-bar',
+  },
+  {
+    name: '高级搜索组件示例',
+    path: '/advanced-search-example',
+    icon: 'mdi:card-search',
+  },
+  {
+    name: '虚拟列表示例',
+    path: '/virtual-column-example',
+    icon: 'mdi:table-column',
+  },
+  {
+    name: '图片光圈(伪类实现)',
+    path: '/new-example',
+    icon: 'mdi:image-filter-center-focus',
+  },
+  {
+    name: '扑克轮播',
+    path: '/poker-carousel',
+    icon: 'mdi:cards-playing-outline',
+  },
+  {
+    name: '动画示例',
+    path: '/animation',
+    icon: 'mdi:animation-play',
+  },
+  {
+    name: 'X\u5149',
+    path: '/x-ray',
+    icon: 'mdi:link',
+  },
+]);
+const isMenuOpen = ref(false);
+const toggleMenu = () => {
+  isMenuOpen.value = !isMenuOpen.value;
+  if (isMenuOpen.value) {
+    document.body.classList.add('no-scroll');
+  } else {
     document.body.classList.remove('no-scroll');
-  };
+  }
+};
+const closeMenu = () => {
+  isMenuOpen.value = false;
+  document.body.classList.remove('no-scroll');
+};
 
-  // 处理 esc 键关闭菜单
-  const handleKeydown = (e: KeyboardEvent) => {
-    if (e.key === 'Escape' && isMenuOpen.value) {
-      closeMenu();
-    }
-  };
+// 处理 esc 键关闭菜单
+const handleKeydown = (e: KeyboardEvent) => {
+  if (e.key === 'Escape' && isMenuOpen.value) {
+    closeMenu();
+  }
+};
 
-  // 定义菜单按钮的引用
-  const menuButton = useTemplateRef<HTMLButtonElement>('menuButton');
+// 定义菜单按钮的引用
+const menuButton = useTemplateRef<HTMLButtonElement>('menuButton');
 
-  // 拖拽状态
-  const isDragging = ref(false);
-  const startX = ref(0); // 鼠标按下时的X坐标
-  const startLeft = ref(0); // 鼠标按下时元素的left值
+// 拖拽状态
+const isDragging = ref(false);
+const startX = ref(0); // 鼠标按下时的X坐标
+const startLeft = ref(0); // 鼠标按下时元素的left值
 
-  // 处理鼠标按下事件
-  const handleMouseDown = (e: MouseEvent) => {
-    // 只有当按下 Ctrl (或 Alt) 键时才开始拖拽，防止与点击事件冲突
-    // 你可以根据需要选择 CtrlKey, AltKey, ShiftKey 或 MetaKey (Command on Mac)
-    if (!e.ctrlKey) return; // 改为 e.altKey 如果想用 Alt 键
+// 处理鼠标按下事件
+const handleMouseDown = (e: MouseEvent) => {
+  // 只有当按下 Ctrl (或 Alt) 键时才开始拖拽，防止与点击事件冲突
+  // 你可以根据需要选择 CtrlKey, AltKey, ShiftKey 或 MetaKey (Command on Mac)
+  if (!e.ctrlKey) return; // 改为 e.altKey 如果想用 Alt 键
 
-    // 阻止默认行为（如文本选择）
-    e.preventDefault();
+  // 阻止默认行为（如文本选择）
+  e.preventDefault();
 
-    // 记录初始状态
-    isDragging.value = true;
-    startX.value = e.clientX;
-    // 获取当前元素的 left 值（考虑可能的 transform 或其他定位）
-    const rect = menuButton.value?.getBoundingClientRect();
-    if (rect) {
-      // 我们需要将相对视口的位置转换为相对于其定位上下文（这里是视口）的 left 值
-      // 因为它是 fixed 定位，left 是相对于视口的
-      // getComputedStyle 可以获取应用了所有样式后的计算值
-      const computedStyle = window.getComputedStyle(menuButton.value!);
-      const currentLeft = parseFloat(computedStyle.left) || 0;
-      startLeft.value = currentLeft;
-    }
+  // 记录初始状态
+  isDragging.value = true;
+  startX.value = e.clientX;
+  // 获取当前元素的 left 值（考虑可能的 transform 或其他定位）
+  const rect = menuButton.value?.getBoundingClientRect();
+  if (rect) {
+    // 我们需要将相对视口的位置转换为相对于其定位上下文（这里是视口）的 left 值
+    // 因为它是 fixed 定位，left 是相对于视口的
+    // getComputedStyle 可以获取应用了所有样式后的计算值
+    const computedStyle = window.getComputedStyle(menuButton.value!);
+    const currentLeft = parseFloat(computedStyle.left) || 0;
+    startLeft.value = currentLeft;
+  }
 
-    // 添加全局事件监听器，确保即使鼠标移出元素也能继续拖拽和结束拖拽
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-  };
+  // 添加全局事件监听器，确保即使鼠标移出元素也能继续拖拽和结束拖拽
+  document.addEventListener('mousemove', handleMouseMove);
+  document.addEventListener('mouseup', handleMouseUp);
+};
 
-  // 处理鼠标移动事件（拖拽中）
-  const handleMouseMove = (e: MouseEvent) => {
-    if (!isDragging.value) return;
+// 处理鼠标移动事件（拖拽中）
+const handleMouseMove = (e: MouseEvent) => {
+  if (!isDragging.value) return;
 
-    // 计算鼠标在水平方向上的位移
-    const deltaX = e.clientX - startX.value;
+  // 计算鼠标在水平方向上的位移
+  const deltaX = e.clientX - startX.value;
 
-    // 计算新的 left 值
-    let newLeft = startLeft.value + deltaX;
+  // 计算新的 left 值
+  let newLeft = startLeft.value + deltaX;
 
-    // 可选：添加边界限制，防止元素移出视口
-    // 获取视口宽度和元素宽度
-    const viewportWidth = window.innerWidth;
-    const elementWidth = menuButton.value?.offsetWidth || 0;
+  // 可选：添加边界限制，防止元素移出视口
+  // 获取视口宽度和元素宽度
+  const viewportWidth = window.innerWidth;
+  const elementWidth = menuButton.value?.offsetWidth || 0;
 
-    // 限制在视口内：不能小于 0（左边界），不能大于 (viewportWidth - elementWidth)（右边界）
-    newLeft = Math.max(0, Math.min(newLeft, viewportWidth - elementWidth));
+  // 限制在视口内：不能小于 0（左边界），不能大于 (viewportWidth - elementWidth)（右边界）
+  newLeft = Math.max(0, Math.min(newLeft, viewportWidth - elementWidth));
 
-    // 更新元素的 left 样式
-    if (menuButton.value) {
-      menuButton.value.style.left = `${newLeft}px`;
-      // 注意：这会覆盖内联样式。如果初始 left 不是通过内联样式设置的，
-      // 可能需要考虑其他方式（如 CSS 类或 CSS 变量），但内联样式在此场景下是直接有效的。
-    }
-  };
+  // 更新元素的 left 样式
+  if (menuButton.value) {
+    menuButton.value.style.left = `${newLeft}px`;
+    // 注意：这会覆盖内联样式。如果初始 left 不是通过内联样式设置的，
+    // 可能需要考虑其他方式（如 CSS 类或 CSS 变量），但内联样式在此场景下是直接有效的。
+  }
+};
 
-  // 处理鼠标松开事件（结束拖拽）
-  const handleMouseUp = () => {
-    if (isDragging.value) {
-      isDragging.value = false;
-      // 移除全局事件监听器
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    }
-  };
+// 处理鼠标松开事件（结束拖拽）
+const handleMouseUp = () => {
+  if (isDragging.value) {
+    isDragging.value = false;
+    // 移除全局事件监听器
+    document.removeEventListener('mousemove', handleMouseMove);
+    document.removeEventListener('mouseup', handleMouseUp);
+  }
+};
+onMounted(() => {
+  document.addEventListener('keydown', handleKeydown);
+});
+onBeforeUnmount(() => {
+  document.removeEventListener('keydown', handleKeydown);
+  document.body.classList.remove('no-scroll');
+  if (isDragging.value) {
+    document.removeEventListener('mousemove', handleMouseMove);
+    document.removeEventListener('mouseup', handleMouseUp);
+  }
+});
 
-  onMounted(() => {
-    document.addEventListener('keydown', handleKeydown);
-  });
-
-  onBeforeUnmount(() => {
-    document.removeEventListener('keydown', handleKeydown);
-    document.body.classList.remove('no-scroll');
-
-    if (isDragging.value) {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    }
-  });
 </script>
 
 <style scoped>
