@@ -41,17 +41,10 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, useTemplateRef } from 'vue';
 import { Icon } from '@iconify/vue';
+
 const navList = ref([
-  {
-    name: '饼图示例',
-    path: '/chart-example',
-    icon: 'mdi:chart-pie',
-  },
-  {
-    name: '柱状图示例',
-    path: '/bar-chart-example',
-    icon: 'mdi:chart-bar',
-  },
+  { name: '饼图示例', path: '/chart-example', icon: 'mdi:chart-pie' },
+  { name: '柱状图示例', path: '/bar-chart-example', icon: 'mdi:chart-bar' },
   {
     name: '高级搜索组件示例',
     path: '/advanced-search-example',
@@ -72,17 +65,10 @@ const navList = ref([
     path: '/poker-carousel',
     icon: 'mdi:cards-playing-outline',
   },
-  {
-    name: '动画示例',
-    path: '/animation',
-    icon: 'mdi:animation-play',
-  },
-  {
-    name: 'MouseTrack',
-    path: '/mouse-track',
-    icon: 'mdi:link',
-  },
+  { name: '动画示例', path: '/animation', icon: 'mdi:animation-play' },
+  { name: 'MouseAnime', path: '/mouse-anime', icon: 'mdi:link' },
 ]);
+
 const isMenuOpen = ref(false);
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value;
@@ -92,6 +78,7 @@ const toggleMenu = () => {
     document.body.classList.remove('no-scroll');
   }
 };
+
 const closeMenu = () => {
   isMenuOpen.value = false;
   document.body.classList.remove('no-scroll');
@@ -175,12 +162,15 @@ const handleMouseUp = () => {
     document.removeEventListener('mouseup', handleMouseUp);
   }
 };
+
 onMounted(() => {
   document.addEventListener('keydown', handleKeydown);
 });
+
 onBeforeUnmount(() => {
   document.removeEventListener('keydown', handleKeydown);
   document.body.classList.remove('no-scroll');
+
   if (isDragging.value) {
     document.removeEventListener('mousemove', handleMouseMove);
     document.removeEventListener('mouseup', handleMouseUp);

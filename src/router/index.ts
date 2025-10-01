@@ -43,9 +43,9 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/views/AnimationExample/AnimationExample.vue'),
   },
   {
-    path: '/mouse-track',
-    name: 'MouseTrack',
-    component: () => import('../views/MouseTrack/index.vue'),
+    path: '/mouse-anime',
+    name: 'MouseAnime',
+    component: () => import('../views/MouseAnime/index.vue'),
   },
 ];
 
