@@ -47,6 +47,11 @@ const routes: Array<RouteRecordRaw> = [
     name: 'MouseAnime',
     component: () => import('../views/MouseAnime/index.vue'),
   },
+  {
+    path: '/dodge-button',
+    name: 'DodgeButton',
+    component: () => import('../views/DodgeButton/index.vue'),
+  },
 ];
 
 const router = createRouter({

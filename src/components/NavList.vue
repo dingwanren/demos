@@ -67,6 +67,7 @@ const navList = ref([
   },
   { name: '动画示例', path: '/animation', icon: 'mdi:animation-play' },
   { name: 'MouseAnime', path: '/mouse-anime', icon: 'mdi:link' },
+  { name: 'DodgeButton', path: 'dodge-button', icon: 'mdi:link' },
 ]);
 
 const isMenuOpen = ref(false);
