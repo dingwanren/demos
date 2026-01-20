@@ -68,6 +68,8 @@ const navList = ref([
   { name: '动画示例', path: '/animation', icon: 'mdi:animation-play' },
   { name: 'MouseAnime', path: '/mouse-anime', icon: 'mdi:link' },
   { name: 'DodgeButton', path: 'dodge-button', icon: 'mdi:link' },
+  { name: 'VirtualList', path: '/virtuallist', icon: 'mdi:link' },
+  { name: '\u62D6\u62FD\u6D4B\u8BD5', path: '/dragtest', icon: 'mdi:link' },
 ]);
 
 const isMenuOpen = ref(false);
@@ -231,6 +233,7 @@ onBeforeUnmount(() => {
     align-items: center;
     z-index: 1000;
     outline: none;
+    overflow: auto;
   }
 
   .nav-list {

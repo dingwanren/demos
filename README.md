@@ -1,7 +1,8 @@
-# Vue 3 + TypeScript + Vite
-
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
-
-Learn more about the recommended Project Setup and IDE Support in the [Vue Docs TypeScript Guide](https://vuejs.org/guide/typescript/overview.html#project-setup).
+# DEMOS
+用来统一存放写的一些demo效果
 
 ## 用的npm,后续都用npm吧
+
+## mk-cli
+方便创建新的页面, 会自动插入路由和菜单项
+在cli目录中,修改后重新打包,之后返回根目录重新npm i,就可以使用npm run create:example

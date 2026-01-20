@@ -68,5 +68,5 @@ export default async function createExample() {
   await addRouteToRouterFile(name, routePath, title);
 
   // ✅ 添加菜单项
-  await addMenuItemToMenuComponent(name, routePath);
+  await addMenuItemToMenuComponent(title, routePath);
 }

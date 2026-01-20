@@ -5,17 +5,17 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'home',
-    component: () => import('@/views/Home.vue'),
+    component: () => import('@/views/Home/index.vue'),
   },
   {
     path: '/chart-example',
     name: 'ChartExample',
-    component: () => import('@/views/ChartExample.vue'),
+    component: () => import('@/views/ChartExample/index.vue'),
   },
   {
     path: '/advanced-search-example',
     name: 'AdvancedSearchExample',
-    component: () => import('@/views/AdvancedSearchExample.vue'),
+    component: () => import('@/views/AdvancedSearchExample/index.vue'),
   },
   {
     path: '/virtual-column-example',
@@ -25,22 +25,22 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/new-example',
     name: 'NewExample',
-    component: () => import('@/views/PhotoHalo.vue'),
+    component: () => import('@/views/PhotoHalo/index.vue'),
   },
   {
     path: '/poker-carousel',
     name: 'PokerCarousel',
-    component: () => import('@/views/PokerCarousel.vue'),
+    component: () => import('@/views/PokerCarousel/index.vue'),
   },
   {
     path: '/bar-chart-example',
     name: 'BarChartExample',
-    component: () => import('@/views/BarChartExample.vue'),
+    component: () => import('@/views/BarChartExample/index.vue'),
   },
   {
     path: '/animation',
     name: 'Animation',
-    component: () => import('@/views/AnimationExample/AnimationExample.vue'),
+    component: () => import('@/views/AnimationExample/index.vue'),
   },
   {
     path: '/mouse-anime',
@@ -51,6 +51,16 @@ const routes: Array<RouteRecordRaw> = [
     path: '/dodge-button',
     name: 'DodgeButton',
     component: () => import('../views/DodgeButton/index.vue'),
+  },
+  {
+    path: '/virtuallist',
+    name: 'VirtualList',
+    component: () => import('../views/VirtualList/index.vue'),
+  },
+  {
+    path: '/dragtest',
+    name: 'DragTest',
+    component: () => import('../views/DragTest/index.vue'),
   },
 ];
 
