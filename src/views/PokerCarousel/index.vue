@@ -1,7 +1,7 @@
 <template>
   <div class="poker-container" ref="container">
     <div 
-      v-for="(card, index) in 9" 
+      v-for="(_, index) in 9" 
       :key="index" 
       @mouseenter="hoverCard(index)"
       @mouseleave="resetCard(index)"
@@ -65,6 +65,7 @@ const hoverCard = (index: number) => {
 }
 
 const resetCard = (index: number) => {
+  console.log(index)
   if (dragIndex.value === null) {
     hoverIndex.value = null
   }

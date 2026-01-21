@@ -18,10 +18,10 @@
       <!-- 圆心调试点 -->
       <div class="center-point"></div>
       <div
-        v-for="(eye, eyeIndex) in circle.eyeCount"
+        v-for="(_, eyeIndex) in circle.eyeCount"
         :key="eyeIndex"
         class="eye-container"
-        :ref="(el) => setEyeRef(el, circleIndex, eyeIndex)"
+        :ref="(el) => setEyeRef(el as HTMLElement, circleIndex, eyeIndex)"
         :style="getEyeStyle(circleIndex, eyeIndex)"
       ></div>
     </div>
@@ -29,8 +29,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onBeforeUnmount, watch, type Ref } from "vue";
-import lottie, { type AnimationItem } from "lottie-web";
+import { ref, onBeforeUnmount, watch } from "vue";
+import lottie from "lottie-web";
 import eyeAnimation from "@/assets/eye.json";
 import circlePanel from "./components/circlePanel.vue";
 
@@ -100,7 +100,7 @@ const getEyeStyle = (circleIndex: number, eyeIndex: number) => {
 };
 
 onBeforeUnmount(() => {
-  animMap.forEach((anim, container) => {
+  animMap.forEach((anim) => {
     anim.destroy();  // 销毁 Lottie 动画
   });
 });

@@ -8,8 +8,7 @@
       <button
         class="btn no-btn"
         :style="{ '--top': `${top}px`, '--left': `${left}px` }"
-        @click="handleNoClick"
-      >
+        @click="handleNoClick">
         no
       </button>
     </div>
@@ -17,19 +16,19 @@
 </template>
 
 <script setup lang="ts">
-  import { computed, ref, useTemplateRef } from 'vue';
+  import { ref } from 'vue';
   const top = ref(10);
   const left = ref(10);
   const noClickCount = ref(0);
 
-  const container = useTemplateRef<HTMLDivElement>('container');
-  const containerXY = computed(() => {
-    const rect = container.value.getBoundingClientRect();
-    return {
-      left: rect.left,
-      top: rect.top,
-    };
-  });
+  // const container = useTemplateRef<HTMLDivElement>('container');
+  // const containerXY = computed(() => {
+  //   const rect = container.value.getBoundingClientRect();
+  //   return {
+  //     left: rect.left,
+  //     top: rect.top,
+  //   };
+  // });
   // 容器mouseenter 获取鼠标xy坐标
   // top left和button固定宽度可得按钮区域,可以上下左右再+10px 提前判断进去区域
   // 进去即 随机改变 top left 值躲避鼠标,但感觉可以以鼠标位置为圆,某个值为半径,限制改变后的位置需在此区域外
@@ -40,18 +39,18 @@
     //  offsetXY进入子元素后,原点就变成了子元素了,我想要一直以父元素为原点的
     const mouseX = e.offsetX;
     const mouseY = e.offsetY;
-      console.log(mouseX, mouseY, top.value, left.value);
+    console.log(mouseX, mouseY, top.value, left.value);
 
     if (
       top.value + 40 + 5 >= mouseY && // 下
-      mouseY + 5 >= top.value &&  // 上
+      mouseY + 5 >= top.value && // 上
       left.value + 60 + 5 >= mouseX && // 右
       mouseX + 5 >= left.value // 左
     ) {
       // 进入区域了
       console.log('进入区域了', mouseX, mouseY, top.value, left.value);
-      top.value = Math.random() * 400
-      left.value = Math.random() * 400
+      top.value = Math.random() * 400;
+      left.value = Math.random() * 400;
     }
   }
 
@@ -59,11 +58,10 @@
   //   // 升级版: 以鼠标xy为圆心, radius为半径,划出一个区域
   // }
 
-  function changePosition() {}
+  // function changePosition() {}
 
-
-  function handleNoClick () {
-    noClickCount.value++
+  function handleNoClick() {
+    noClickCount.value++;
   }
 </script>
 

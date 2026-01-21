@@ -54,12 +54,12 @@
   const selectedValue = ref<string>('fixed');
   const handleChange = (event: Event, value: string) => {
     // 占位,下面代码ai给的,但有v-model,不用手动改了
-    // const target = event.target as HTMLInputElement;
-    // if (target.checked) {
-    //   selectedValue.value = value;
-    //   console.log('选中了:', value);
-    //   // 执行相关逻辑
-    // }
+    const target = event.target as HTMLInputElement;
+    if (target.checked) {
+      // selectedValue.value = value;
+      console.log('选中了:', value);
+      // 执行相关逻辑
+    }
   };
 
   const currentList = computed(() => {
