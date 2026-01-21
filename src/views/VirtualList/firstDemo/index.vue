@@ -19,7 +19,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import VirtualList from './components/VirtualList.vue'
-import { generateMockList } from '../../mock/mockData'
+import { generateMockList } from './mock/mockData'
 
 interface ListItem {
   id: string

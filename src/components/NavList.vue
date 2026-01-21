@@ -51,11 +51,6 @@ const navList = ref([
     icon: 'mdi:card-search',
   },
   {
-    name: '虚拟列表示例',
-    path: '/virtual-column-example',
-    icon: 'mdi:table-column',
-  },
-  {
     name: '图片光圈(伪类实现)',
     path: '/new-example',
     icon: 'mdi:image-filter-center-focus',
@@ -68,7 +63,7 @@ const navList = ref([
   { name: '动画示例', path: '/animation', icon: 'mdi:animation-play' },
   { name: 'MouseAnime', path: '/mouse-anime', icon: 'mdi:link' },
   { name: 'DodgeButton', path: 'dodge-button', icon: 'mdi:link' },
-  { name: 'VirtualList', path: '/virtuallist', icon: 'mdi:link' },
+  { name: '虚拟列表示例', path: '/virtuallist', icon: 'mdi:table-column' },
   { name: '\u62D6\u62FD\u6D4B\u8BD5', path: '/dragtest', icon: 'mdi:link' },
 ]);
 

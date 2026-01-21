@@ -18,11 +18,6 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/views/AdvancedSearchExample/index.vue'),
   },
   {
-    path: '/virtual-column-example',
-    name: 'VirtualColumnExample',
-    component: () => import('@/views/VirtualList/VirtualColumnExample.vue'),
-  },
-  {
     path: '/new-example',
     name: 'NewExample',
     component: () => import('@/views/PhotoHalo/index.vue'),

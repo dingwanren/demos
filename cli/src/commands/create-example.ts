@@ -6,6 +6,7 @@ import fs from 'fs-extra';
 import { renderTemplate } from '../utils/template.js';
 import { addRouteToRouterFile } from '../utils/route.js';
 import { addMenuItemToMenuComponent } from '../utils/menus.js';
+import { toKebabCase } from '../utils/stringUtils.js'
 
 // 主项目 views 目录
 const VIEWS_DIR = path.resolve(process.cwd(), 'src', 'views');
@@ -13,7 +14,7 @@ const VIEWS_DIR = path.resolve(process.cwd(), 'src', 'views');
 export default async function createExample() {
   console.log(chalk.cyan('🚀 欢迎使用示例页面生成器！'));
 
-  const answers = await inquirer.prompt([
+  const answers: {name: string, routePath: string, title: string} = await inquirer.prompt([
     {
       type: 'input',
       name: 'name',
@@ -41,12 +42,8 @@ export default async function createExample() {
     },
   ]);
 
-  const { name, routePath, title } : {name: string, routePath: string, title: string} = answers;
-
-  console.log(chalk.green('\n✅ 用户输入：'));
-  console.log(`  页面英文名: ${name}`);
-  console.log(`  页面路径: ${routePath}`);
-  console.log(`  页面中文名: ${title}`);
+  const { name, routePath, title }  = answers;
+  const kebabPath = toKebabCase(routePath)
 
   const targetDir = path.join(VIEWS_DIR, name);
 
@@ -65,8 +62,8 @@ export default async function createExample() {
   console.log(chalk.green(`🎉 页面 ${name} 创建完成！`));
 
   // ✅ 添加路由
-  await addRouteToRouterFile(name, routePath, title);
+  await addRouteToRouterFile(name, kebabPath, title);
 
   // ✅ 添加菜单项
-  await addMenuItemToMenuComponent(title, routePath);
+  await addMenuItemToMenuComponent(title, kebabPath);
 }

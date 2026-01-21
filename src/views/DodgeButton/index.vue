@@ -22,7 +22,7 @@
   const left = ref(10);
   const noClickCount = ref(0);
 
-  const container = useTemplateRef('container');
+  const container = useTemplateRef<HTMLDivElement>('container');
   const containerXY = computed(() => {
     const rect = container.value.getBoundingClientRect();
     return {
@@ -33,7 +33,7 @@
   // 容器mouseenter 获取鼠标xy坐标
   // top left和button固定宽度可得按钮区域,可以上下左右再+10px 提前判断进去区域
   // 进去即 随机改变 top left 值躲避鼠标,但感觉可以以鼠标位置为圆,某个值为半径,限制改变后的位置需在此区域外
-  function handlerMouseEnter(e: EventTarget) {
+  function handlerMouseEnter(e: MouseEvent) {
     // 这里类型是啥
 
     // 鼠标在容器的里相对位置
