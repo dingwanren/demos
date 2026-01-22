@@ -13,10 +13,10 @@
     </button>
 
     <!-- 全屏导航菜单 -->
-    <transition name="fade">
+    <!-- <transition name="fade"> -->
       <div
-        v-if="isMenuOpen"
         class="fullscreen-menu"
+        :class="{ 'active': isMenuOpen }"
         @keydown.esc="closeMenu"
         tabindex="0"
         @click.self="closeMenu">
@@ -34,7 +34,7 @@
           </RouterLink>
         </nav>
       </div>
-    </transition>
+    <!-- </transition> -->
   </div>
 </template>
 
@@ -184,6 +184,7 @@ onBeforeUnmount(() => {
     top: 0;
     left: 0;
     width: 100%;
+    height: 100%;
     z-index: 1000;
   }
 
@@ -222,13 +223,29 @@ onBeforeUnmount(() => {
     left: 0;
     width: 100%;
     height: 100vh;
-    background-color: rgba(255, 255, 255, 0.98);
+    background-color: rgba(230, 230, 230, 0.98);
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
     outline: none;
     overflow: auto;
+    /* 初始状态：从右上角开始的小圆 */
+    clip-path: circle(0% at 0 0);
+
+    /* 过渡动画 */
+    transition: clip-path 0.6s cubic-bezier(0.86, 0, 0.07, 1);
+
+    /* 防止点击穿透 */
+    pointer-events: none;
+  }
+
+  .fullscreen-menu.active {
+    /* 展开状态：覆盖整个屏幕的大圆 */
+    clip-path: circle(150% at 0 0);
+    
+    /* 激活时允许点击 */
+    pointer-events: all;
   }
 
   .nav-list {
