@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>极简拖拽排序 · 面试核心版</title>
+    <style>
+        /* 只保留最核心样式，去掉装饰 */
+        * {
+            user-select: none; /* 拖拽时防止选中文字 */
+        }
+        body {
+            font-family: system-ui, sans-serif;
+            padding: 20px;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        .list {
+            list-style: none;
+            padding: 0;
+            border: 1px solid #ccc;
+            background: #fafafa;
+        }
+        .item {
+            padding: 16px;
+            margin: 4px;
+            background: white;
+            border: 1px solid #ddd;
+            cursor: grab;
+            font-size: 18px;
+        }
+        /* 拖拽时的样式 */
+        .item.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+        /* 插入指示器：上边框表示插入到该元素之前，下边框表示插入到之后 */
+        .item.insert-before {
+            border-top: 3px solid #0066ff;
+        }
+        .item.insert-after {
+            border-bottom: 3px solid #0066ff;
+        }
+        /* 简洁数据展示 */
+        .order {
+            margin-top: 20px;
+            padding: 12px;
+            background: #f0f0f0;
+        }
+        button {
+            padding: 8px 16px;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+    <h3>🔹 拖拽排序 (极简版)</h3>
+    
+    <ul class="list" id="list">
+        <!-- 动态生成 -->
+    </ul>
+
+    <div class="order">
+        <strong>当前顺序:</strong> 
+        <span id="orderDisplay"></span>
+        <button id="reset">重置</button>
+    </div>
+
+    <script>
+        // ---------- 1. 核心数据 ----------
+        let items = ['📦 设计稿', '📝 开发', '🧪 测试', '🚀 部署', '📊 复盘'];
+
+        // DOM 元素
+        const listEl = document.getElementById('list');
+        const orderSpan = document.getElementById('orderDisplay');
+
+        // 拖拽状态 (只需要记录最关键的)
+        let dragSrcIndex = null;      // 拖拽源索引
+        let targetIndex = null;       // 当前目标索引
+        let dragDirection = null;     // 'before' 或 'after'，用于实时指示
+
+        // ---------- 2. 渲染列表 ----------
+        function render() {
+            listEl.innerHTML = items.map((text, index) => 
+                `<li class="item" draggable="true" data-index="${index}">${text}</li>`
+            ).join('');
+            attachEvents();           // 重新绑定事件
+            updateOrderDisplay();
+        }
+
+        // ---------- 3. 事件绑定 ----------
+        function attachEvents() {
+            const items = document.querySelectorAll('.item');
+            items.forEach(item => {
+                item.addEventListener('dragstart', dragStart);
+                item.addEventListener('dragenter', dragEnter);
+                item.addEventListener('dragleave', dragLeave);
+                item.addEventListener('dragover', dragOver);
+                item.addEventListener('dragend', dragEnd);
+                item.addEventListener('drop', (e) => e.preventDefault()); // 阻止默认
+            });
+        }
+
+        // ---------- 4. 拖拽核心逻辑 ----------
+        function dragStart(e) {
+            // 记录拖拽的源索引
+            dragSrcIndex = Number(this.dataset.index);
+            // 添加拖拽样式
+            this.classList.add('dragging');
+            // 必须设置，允许拖拽
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function dragEnter(e) {
+            e.preventDefault();
+            const target = this;
+            const targetIdx = Number(target.dataset.index);
+
+            // 忽略拖拽自身
+            if (targetIdx === dragSrcIndex) return;
+
+            // 关键：判断鼠标进入的位置，决定是插入到目标之前还是之后
+            // 获取目标元素的位置信息
+            const rect = target.getBoundingClientRect();
+            const mouseY = e.clientY;
+            const targetMiddleY = rect.top + rect.height / 2;
+
+            // 移除所有插入指示类
+            document.querySelectorAll('.item').forEach(el => {
+                el.classList.remove('insert-before', 'insert-after');
+            });
+
+            // 根据鼠标在目标元素的上半部分还是下半部分决定指示器方向
+            if (mouseY < targetMiddleY) {
+                // 插入到目标之前
+                target.classList.add('insert-before');
+                targetIndex = targetIdx;
+                dragDirection = 'before';
+                // 如果源索引小于目标索引，实际插入位置需要调整（因为移除源后索引会变）
+            } else {
+                // 插入到目标之后
+                target.classList.add('insert-after');
+                targetIndex = targetIdx;
+                dragDirection = 'after';
+            }
+        }
+
+        function dragLeave(e) {
+            // 简单移除当前元素的指示类，避免残留
+            this.classList.remove('insert-before', 'insert-after');
+        }
+
+        function dragOver(e) {
+            e.preventDefault(); // 必须阻止才能允许drop
+            e.dataTransfer.dropEffect = 'move';
+        }
+
+        function dragEnd(e) {
+            // 移除所有样式
+            document.querySelectorAll('.item').forEach(el => {
+                el.classList.remove('dragging', 'insert-before', 'insert-after');
+            });
+
+            // 核心：如果目标索引有效且不是同一个位置，执行排序
+            if (targetIndex !== null && targetIndex !== dragSrcIndex) {
+                // 计算真正的插入位置
+                let newIndex = targetIndex;
+                
+                // 调整索引：如果从前面拖到后面，因为移除源元素，目标索引会减1
+                if (dragSrcIndex < targetIndex) {
+                    newIndex = targetIndex - 1;
+                }
+                
+                // 如果是插入到目标之后，且目标在源后面，需要额外处理
+                // 但我们的dragEnter已经区分了before/after，所以需要根据方向调整
+                if (dragDirection === 'after') {
+                    // 插入到目标之后，意味着新索引应该是目标索引+1（考虑移除源后的调整）
+                    // 先简单处理：统一用splice实现
+                    // 更清晰的方法：先移除源，再根据方向插入
+                }
+
+                // 简洁且正确的实现：根据方向直接操作数组
+                const newItems = [...items];
+                const [moved] = newItems.splice(dragSrcIndex, 1); // 移除源
+                
+                // 确定插入位置
+                let insertPos = targetIndex;
+                if (dragDirection === 'after') {
+                    // 插入到目标之后，如果目标在原位置后面，需要调整
+                    insertPos = (dragSrcIndex < targetIndex) ? targetIndex - 1 + 1 : targetIndex + 1;
+                } else {
+                    // 插入到目标之前
+                    insertPos = (dragSrcIndex < targetIndex) ? targetIndex - 1 : targetIndex;
+                }
+                
+                // 修正：更简单的逻辑
+                // 直接根据源和目标以及方向计算
+                let finalIndex;
+                if (dragDirection === 'before') {
+                    finalIndex = (dragSrcIndex < targetIndex) ? targetIndex - 1 : targetIndex;
+                } else { // after
+                    finalIndex = (dragSrcIndex < targetIndex) ? targetIndex : targetIndex + 1;
+                }
+                
+                // 确保索引有效
+                finalIndex = Math.max(0, Math.min(finalIndex, newItems.length));
+                newItems.splice(finalIndex, 0, moved);
+                
+                // 更新数据
+                items = newItems;
+                render(); // 重新渲染
+            }
+
+            // 重置状态
+            dragSrcIndex = null;
+            targetIndex = null;
+            dragDirection = null;
+        }
+
+        // 更新顺序显示
+        function updateOrderDisplay() {
+            orderSpan.textContent = items.map(t => t.split(' ')[1]).join(' → ');
+        }
+
+        // 重置
+        function reset() {
+            items = ['📦 设计稿', '📝 开发', '🧪 测试', '🚀 部署', '📊 复盘'];
+            render();
+        }
+
+        // 初始化
+        render();
+        document.getElementById('reset').addEventListener('click', reset);
+    </script>
+
+    <!-- 
+        核心实现解释:
+        1. 鼠标拖拽: 通过 draggable="true" 和 dragstart 事件
+        2. 实时位置: 在 dragenter 中根据鼠标Y坐标与目标元素中点的比较，添加 insert-before/after 类
+           上边框表示插入到该元素前，下边框表示插入到该元素后，解决了"往前挤还是往后挤"的疑问
+        3. 更新数据: dragend 中根据记录的源索引、目标索引和方向，操作数组后重新渲染
+    -->
+</body>
+</html>

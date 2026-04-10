@@ -64,7 +64,7 @@ const navList = ref([
   { name: 'MouseAnime', path: '/mouse-anime', icon: 'mdi:link' },
   { name: 'DodgeButton', path: 'dodge-button', icon: 'mdi:link' },
   { name: '虚拟列表示例', path: '/virtuallist', icon: 'mdi:table-column' },
-  { name: '\u62D6\u62FD\u6D4B\u8BD5', path: '/dragtest', icon: 'mdi:link' },
+  { name: '拖拽排序', path: '/dragtest', icon: 'mdi:link' },
 ]);
 
 const isMenuOpen = ref(false);
@@ -184,7 +184,7 @@ onBeforeUnmount(() => {
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
+    /* height: 100%; 加了会挡住整个屏幕 */
     z-index: 1000;
   }
 
