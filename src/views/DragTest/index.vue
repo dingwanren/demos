@@ -122,6 +122,8 @@
    * @param index 鼠标正悬停的元素索引
    */
   const handleDragOver = (index: number) => {
+    console.log(index);
+    
     // .prevent 修饰符已经调用了 event.preventDefault()
     // 这里可以添加逻辑来高亮目标位置（可选）
   };

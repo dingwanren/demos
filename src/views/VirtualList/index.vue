@@ -37,6 +37,8 @@
   import { computed, ref } from 'vue';
   import firstDemo from './firstDemo/index.vue';
   import fixed from './fixed/index.vue';
+  import unfixed from './unfixed/index.vue';
+  import doubleCol from './doubleCol/index.vue';
 
   interface RadioOption {
     value: string;
@@ -65,7 +67,9 @@
   const currentList = computed(() => {
     return {
       firstDemo,
-      fixed
+      fixed,
+      unfixed,
+      doubleCol
     }[selectedValue.value];
   });
 </script>
